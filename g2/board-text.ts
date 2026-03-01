@@ -9,6 +9,7 @@ import type { TileMove } from './game'
 
 const EMPTY = '\u3000' // 　(ideographic space / full-width space)
 const PLACEHOLDER_CHAR = '\u2592' // ▒ (medium shade for new tile fade-in)
+const BORDER_CHAR = '\u2015' // ― (horizontal bar)
 
 // Circled number mapping: tile value → single full-width character
 const CIRCLED_NUMBERS: Record<number, string> = {
@@ -41,6 +42,13 @@ export function getCellWidth(_boardSize: number): number {
   return 1
 }
 
+// Border line: ＿ ＿ ＿ ＿ (same width pattern as board rows)
+function borderLine(size: number): string {
+  const cells: string[] = []
+  for (let i = 0; i < size; i++) cells.push(BORDER_CHAR)
+  return cells.join(' ')
+}
+
 // ---------------------------------------------------------------------------
 // Render board: all full-width chars, no grid lines
 // Each cell = 1 full-width character, separated by full-width space
@@ -48,7 +56,8 @@ export function getCellWidth(_boardSize: number): number {
 
 export function renderFullBoard(board: Board, excludeCells?: Set<string>): string {
   const size = board.length
-  const lines: string[] = []
+  const border = borderLine(size)
+  const lines: string[] = [border]
 
   for (let r = 0; r < size; r++) {
     let row = ''
@@ -64,6 +73,7 @@ export function renderFullBoard(board: Board, excludeCells?: Set<string>): strin
     lines.push(row)
   }
 
+  lines.push(border)
   return lines.join('\n')
 }
 
@@ -92,7 +102,7 @@ export function renderMovingTiles(
     }
   }
 
-  const lines: string[] = []
+  const lines: string[] = ['']  // empty line for top border
   for (let r = 0; r < boardSize; r++) {
     let row = ''
     for (let c = 0; c < boardSize; c++) {
@@ -102,6 +112,7 @@ export function renderMovingTiles(
     }
     lines.push(row)
   }
+  lines.push('')  // empty line for bottom border
 
   return lines.join('\n')
 }
@@ -112,7 +123,8 @@ export function renderMovingTiles(
 
 export function renderBoardWithPlaceholder(board: Board, row: number, col: number): string {
   const size = board.length
-  const lines: string[] = []
+  const border = borderLine(size)
+  const lines: string[] = [border]
 
   for (let r = 0; r < size; r++) {
     let rowStr = ''
@@ -127,6 +139,7 @@ export function renderBoardWithPlaceholder(board: Board, row: number, col: numbe
     lines.push(rowStr)
   }
 
+  lines.push(border)
   return lines.join('\n')
 }
 
@@ -163,7 +176,7 @@ export function renderMovingTilesAtPositions(
   for (const t of tiles) {
     grid.set(`${t.row},${t.col}`, tileChar(t.value))
   }
-  const lines: string[] = []
+  const lines: string[] = ['']  // empty line for top border
   for (let r = 0; r < boardSize; r++) {
     let row = ''
     for (let c = 0; c < boardSize; c++) {
@@ -172,6 +185,7 @@ export function renderMovingTilesAtPositions(
     }
     lines.push(row)
   }
+  lines.push('')  // empty line for bottom border
   return lines.join('\n')
 }
 
