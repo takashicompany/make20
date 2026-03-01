@@ -47,16 +47,19 @@ export function getCellWidth(_boardSize: number): number {
   return 1
 }
 
+// Center padding: (28 fullwidth - board width) / 2 ≈ 10 fullwidth spaces
+const BOARD_PAD = EMPTY.repeat(10)
+
 // Border lines: ┌─ ─ ─ ─┐ / └─ ─ ─ ─┘
 function topBorder(size: number): string {
   const cells: string[] = []
   for (let i = 0; i < size; i++) cells.push(BORDER_H)
-  return CORNER_TL + cells.join(' ') + CORNER_TR
+  return BOARD_PAD + CORNER_TL + cells.join(' ') + CORNER_TR
 }
 function bottomBorder(size: number): string {
   const cells: string[] = []
   for (let i = 0; i < size; i++) cells.push(BORDER_H)
-  return CORNER_BL + cells.join(' ') + CORNER_BR
+  return BOARD_PAD + CORNER_BL + cells.join(' ') + CORNER_BR
 }
 
 // ---------------------------------------------------------------------------
@@ -69,7 +72,7 @@ export function renderFullBoard(board: Board, excludeCells?: Set<string>): strin
   const lines: string[] = [topBorder(size)]
 
   for (let r = 0; r < size; r++) {
-    let row = BORDER_V
+    let row = BOARD_PAD + BORDER_V
     for (let c = 0; c < size; c++) {
       if (c > 0) row += ' '
       const key = `${r},${c}`
@@ -114,13 +117,13 @@ export function renderMovingTiles(
 
   const lines: string[] = ['']  // empty line for top border
   for (let r = 0; r < boardSize; r++) {
-    let row = EMPTY  // offset for ｜
+    let row = BOARD_PAD + EMPTY  // pad + offset for │
     for (let c = 0; c < boardSize; c++) {
       if (c > 0) row += ' '
       const key = `${r},${c}`
       row += movingAt.get(key) ?? EMPTY
     }
-    row += EMPTY  // offset for ｜
+    row += EMPTY  // offset for │
     lines.push(row)
   }
   lines.push('')  // empty line for bottom border
@@ -137,7 +140,7 @@ export function renderBoardWithPlaceholder(board: Board, row: number, col: numbe
   const lines: string[] = [topBorder(size)]
 
   for (let r = 0; r < size; r++) {
-    let rowStr = BORDER_V
+    let rowStr = BOARD_PAD + BORDER_V
     for (let c = 0; c < size; c++) {
       if (c > 0) rowStr += ' '
       if (r === row && c === col) {
@@ -165,10 +168,18 @@ export function renderHeader(
   maxTile: number,
 ): string {
   const axisSymbol = axis === 'vertical' ? '\u2195' : '\u2194' // ↕ or ↔
-  const upDir = axis === 'vertical' ? '\u2191' : '\u2190' // ↑ or ←
-  const downDir = axis === 'vertical' ? '\u2193' : '\u2192' // ↓ or →
   const maxChar = maxTile > 0 ? tileChar(maxTile) : '\u2015' // ― (dash)
-  return `[${axisSymbol}] Scroll Up:${upDir} Down:${downDir} Score:${score} High:${highScore} MAX:${maxChar}`
+  const upLabel = axis === 'vertical' ? '\u2191 : Move UP' : '\u2191 : Move LEFT'
+  const downLabel = axis === 'vertical' ? '\u2193 : Move DOWN' : '\u2193 : Move RIGHT'
+  const lines = [
+    `Score:${score} High:${highScore} Max:${maxChar}`,
+    '',
+    '',
+    `Click: ${axisSymbol}`,
+    upLabel,
+    downLabel,
+  ]
+  return lines.join('\n')
 }
 
 // ---------------------------------------------------------------------------
@@ -189,12 +200,12 @@ export function renderMovingTilesAtPositions(
   }
   const lines: string[] = ['']  // empty line for top border
   for (let r = 0; r < boardSize; r++) {
-    let row = EMPTY  // offset for ｜
+    let row = BOARD_PAD + EMPTY  // pad + offset for │
     for (let c = 0; c < boardSize; c++) {
       if (c > 0) row += ' '
       row += grid.get(`${r},${c}`) ?? EMPTY
     }
-    row += EMPTY  // offset for ｜
+    row += EMPTY  // offset for │
     lines.push(row)
   }
   lines.push('')  // empty line for bottom border

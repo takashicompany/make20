@@ -8,7 +8,6 @@ import { appendEventLog } from '../_shared/log'
 import {
   DISPLAY_WIDTH,
   DISPLAY_HEIGHT,
-  HEADER_HEIGHT,
   BOARD_Y,
   BOARD_HEIGHT,
 } from './layout'
@@ -73,7 +72,7 @@ export async function showGameBoard(): Promise<void> {
         xPosition: 0,
         yPosition: 0,
         width: DISPLAY_WIDTH,
-        height: HEADER_HEIGHT,
+        height: DISPLAY_HEIGHT,
         isEventCapture: 0,
         paddingLength: 4,
       }),
@@ -152,7 +151,7 @@ export async function rebuildGameBoardWithOffset(
         xPosition: 0,
         yPosition: 0,
         width: DISPLAY_WIDTH,
-        height: HEADER_HEIGHT,
+        height: DISPLAY_HEIGHT,
         isEventCapture: 0,
         paddingLength: 4,
       }),
