@@ -7,7 +7,7 @@ import {
   CELL_WIDTH_PX,
   NEW_TILE_DELAY_MS,
 } from './layout'
-import { state, setBridge } from './state'
+import { state, setBridge, saveState, loadState, resetAllData } from './state'
 import type { Direction, TileMove } from './game'
 import { slide, placeRandomTile, isGameOver, createInitialBoard, getMaxTile } from './game'
 import {
@@ -54,6 +54,7 @@ function startGame(): void {
   state.screen = 'game'
   state.animating = false
   updateTracking()
+  saveState()
   void showGameBoard()
   appendEventLog('Game started: 4x4')
 }
@@ -172,6 +173,8 @@ async function executeSlide(direction: Direction): Promise<void> {
       await updateStaticBoard()
     }
 
+    saveState()
+
     // Check game over
     if (isGameOver(state.board)) {
       state.screen = 'gameover'
@@ -243,12 +246,34 @@ export async function initApp(appBridge: EvenAppBridge): Promise<void> {
     onEvenHubEvent(event)
   })
 
-  startGame()
-  appendEventLog('2048: initialized, game started')
+  if (loadState()) {
+    state.screen = 'game'
+    state.animating = false
+    void showGameBoard()
+    appendEventLog('2048: restored saved game')
+  } else {
+    startGame()
+    appendEventLog('2048: initialized, new game')
+  }
+}
+
+export async function resendApp(): Promise<void> {
+  state.animating = false
+  state.startupRendered = false
+  void showGameBoard()
+  appendEventLog('2048: re-sent to glasses')
 }
 
 export async function resetApp(): Promise<void> {
   state.animating = false
   startGame()
-  appendEventLog('2048: reset from UI button')
+  appendEventLog('2048: new game from UI button')
+}
+
+/** Development only: reset all data including records */
+export async function resetDataApp(): Promise<void> {
+  state.animating = false
+  resetAllData()
+  startGame()
+  appendEventLog('2048: all data reset')
 }

@@ -1,9 +1,13 @@
 import type { AppModule } from '../_shared/app-types'
 
-function updateStatus(text: string) {
-  console.log(`[ui] ${text}`)
-  const el = document.getElementById('status')
-  if (el) el.textContent = text
+async function updateScoreDisplay() {
+  const { state } = await import('../g2/state')
+  const scoreEl = document.getElementById('score')
+  const highEl = document.getElementById('high-score')
+  const maxEl = document.getElementById('max-tile')
+  if (scoreEl) scoreEl.textContent = String(state.score)
+  if (highEl) highEl.textContent = String(state.highScore)
+  if (maxEl) maxEl.textContent = state.maxTile > 0 ? String(state.maxTile) : '-'
 }
 
 async function boot() {
@@ -11,21 +15,38 @@ async function boot() {
   const app: AppModule = module.app ?? module.default
 
   document.title = `${app.name} – Even G2`
-  updateStatus(app.initialStatus ?? `${app.name} app ready`)
 
-  const actions = await app.createActions(updateStatus)
+  const actions = await app.createActions(() => {})
   await actions.connect()
 
-  // Reset button: re-send current screen to glasses
-  const resetBtn = document.getElementById('resetBtn') as HTMLButtonElement | null
-  resetBtn?.addEventListener('click', async () => {
+  // Update score display periodically
+  await updateScoreDisplay()
+  setInterval(() => void updateScoreDisplay(), 500)
+
+  // New Game button
+  const newGameBtn = document.getElementById('newGameBtn') as HTMLButtonElement | null
+  newGameBtn?.addEventListener('click', async () => {
     const { resetApp } = await import('../g2/app')
     await resetApp()
-    updateStatus('2048: reset sent to glasses')
+    await updateScoreDisplay()
+  })
+
+  // Resend to glasses button
+  const resendBtn = document.getElementById('resendBtn') as HTMLButtonElement | null
+  resendBtn?.addEventListener('click', async () => {
+    const { resendApp } = await import('../g2/app')
+    await resendApp()
+  })
+
+  // Reset Data button (development only)
+  const resetDataBtn = document.getElementById('resetDataBtn') as HTMLButtonElement | null
+  resetDataBtn?.addEventListener('click', async () => {
+    const { resetDataApp } = await import('../g2/app')
+    await resetDataApp()
+    await updateScoreDisplay()
   })
 }
 
 void boot().catch((error) => {
   console.error('[app-loader] boot failed', error)
-  updateStatus('App boot failed')
 })
