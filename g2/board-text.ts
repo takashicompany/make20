@@ -10,6 +10,7 @@ import type { TileMove } from './game'
 const EMPTY = '\u3000' // 　(ideographic space / full-width space)
 const PLACEHOLDER_CHAR = '\u2592' // ▒ (medium shade for new tile fade-in)
 const BORDER_CHAR = '\u2015' // ― (horizontal bar)
+const SIDE_CHAR = '\uFF5C'  // ｜ (fullwidth vertical bar)
 
 // Circled number mapping: tile value → single full-width character
 const CIRCLED_NUMBERS: Record<number, string> = {
@@ -42,11 +43,11 @@ export function getCellWidth(_boardSize: number): number {
   return 1
 }
 
-// Border line: ＿ ＿ ＿ ＿ (same width pattern as board rows)
+// Border line: 　― ― ― ―　 (fullwidth space at corners, ― for each cell)
 function borderLine(size: number): string {
   const cells: string[] = []
   for (let i = 0; i < size; i++) cells.push(BORDER_CHAR)
-  return cells.join(' ')
+  return EMPTY + cells.join(' ') + EMPTY
 }
 
 // ---------------------------------------------------------------------------
@@ -60,7 +61,7 @@ export function renderFullBoard(board: Board, excludeCells?: Set<string>): strin
   const lines: string[] = [border]
 
   for (let r = 0; r < size; r++) {
-    let row = ''
+    let row = SIDE_CHAR
     for (let c = 0; c < size; c++) {
       if (c > 0) row += ' '
       const key = `${r},${c}`
@@ -70,6 +71,7 @@ export function renderFullBoard(board: Board, excludeCells?: Set<string>): strin
         row += tileChar(board[r][c])
       }
     }
+    row += SIDE_CHAR
     lines.push(row)
   }
 
@@ -104,12 +106,13 @@ export function renderMovingTiles(
 
   const lines: string[] = ['']  // empty line for top border
   for (let r = 0; r < boardSize; r++) {
-    let row = ''
+    let row = EMPTY  // offset for ｜
     for (let c = 0; c < boardSize; c++) {
       if (c > 0) row += ' '
       const key = `${r},${c}`
       row += movingAt.get(key) ?? EMPTY
     }
+    row += EMPTY  // offset for ｜
     lines.push(row)
   }
   lines.push('')  // empty line for bottom border
@@ -127,7 +130,7 @@ export function renderBoardWithPlaceholder(board: Board, row: number, col: numbe
   const lines: string[] = [border]
 
   for (let r = 0; r < size; r++) {
-    let rowStr = ''
+    let rowStr = SIDE_CHAR
     for (let c = 0; c < size; c++) {
       if (c > 0) rowStr += ' '
       if (r === row && c === col) {
@@ -136,6 +139,7 @@ export function renderBoardWithPlaceholder(board: Board, row: number, col: numbe
         rowStr += tileChar(board[r][c])
       }
     }
+    rowStr += SIDE_CHAR
     lines.push(rowStr)
   }
 
@@ -178,11 +182,12 @@ export function renderMovingTilesAtPositions(
   }
   const lines: string[] = ['']  // empty line for top border
   for (let r = 0; r < boardSize; r++) {
-    let row = ''
+    let row = EMPTY  // offset for ｜
     for (let c = 0; c < boardSize; c++) {
       if (c > 0) row += ' '
       row += grid.get(`${r},${c}`) ?? EMPTY
     }
+    row += EMPTY  // offset for ｜
     lines.push(row)
   }
   lines.push('')  // empty line for bottom border

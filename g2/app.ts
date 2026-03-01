@@ -222,9 +222,7 @@ function handleClick(): void {
 }
 
 function handleDoubleClick(): void {
-  if (state.screen === 'game') {
-    restartGame()
-  }
+  // no-op
 }
 
 // ---------------------------------------------------------------------------
