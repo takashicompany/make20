@@ -1,8 +1,6 @@
 import type { EvenAppBridge } from '@evenrealities/even_hub_sdk'
 import { appendEventLog } from '../_shared/log'
 import {
-  MIN_BOARD_SIZE,
-  MAX_BOARD_SIZE,
   ANIM_FRAME_MS,
   ANIM_PIXELS_PER_FRAME,
   CELL_HEIGHT_PX,
@@ -11,17 +9,15 @@ import {
 } from './layout'
 import { state, setBridge } from './state'
 import type { Direction, TileMove } from './game'
-import { slide, placeRandomTile, isGameOver, createInitialBoard } from './game'
+import { slide, placeRandomTile, isGameOver, createInitialBoard, getMaxTile } from './game'
 import {
   renderFullBoard,
   renderHeader,
   renderMovingTilesAtPositions,
 } from './board-text'
 import {
-  showSizeSelect,
   showGameBoard,
   showGameOverScreen,
-  updateSizeSelect,
   updateHeader,
   updateStaticBoard,
   rebuildGameBoardWithOffset,
@@ -36,24 +32,35 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/** Update highScore and maxTile tracking */
+function updateTracking(): void {
+  if (state.score > state.highScore) {
+    state.highScore = state.score
+  }
+  const boardMax = getMaxTile(state.board)
+  if (boardMax > state.maxTile) {
+    state.maxTile = boardMax
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Game lifecycle
 // ---------------------------------------------------------------------------
 
 function startGame(): void {
-  state.board = createInitialBoard(state.boardSize)
+  state.board = createInitialBoard(4)
   state.score = 0
   state.axis = 'vertical'
   state.screen = 'game'
   state.animating = false
+  updateTracking()
   void showGameBoard()
-  appendEventLog(`Game started: ${state.boardSize}x${state.boardSize}`)
+  appendEventLog('Game started: 4x4')
 }
 
 function restartGame(): void {
-  state.screen = 'size-select'
-  void showSizeSelect()
-  appendEventLog('Game: restart → size select')
+  startGame()
+  appendEventLog('Game: restarted')
 }
 
 // ---------------------------------------------------------------------------
@@ -115,7 +122,7 @@ async function executeSlide(direction: Direction): Promise<void> {
       const cellPx = isVertical ? CELL_HEIGHT_PX : CELL_WIDTH_PX
       const sign = (direction === 'left' || direction === 'up') ? -1 : 1
       const framesPerCell = Math.ceil(cellPx / ANIM_PIXELS_PER_FRAME)
-      const headerText = renderHeader(state.score, state.axis, state.boardSize)
+      const headerText = renderHeader(state.score, state.highScore, state.axis, state.maxTile)
 
       // Blank source cells of all moving tiles from state.board
       for (const m of result.moves) {
@@ -131,7 +138,7 @@ async function executeSlide(direction: Direction): Promise<void> {
 
         // Static from current state.board (updated progressively)
         const staticText = renderFullBoard(state.board)
-        const movingText = renderMovingTilesAtPositions(movingTiles, state.boardSize)
+        const movingText = renderMovingTilesAtPositions(movingTiles, 4)
 
         const startFrame = phase === 0 ? 0 : 1
         for (let frame = startFrame; frame <= framesPerCell; frame++) {
@@ -155,6 +162,7 @@ async function executeSlide(direction: Direction): Promise<void> {
 
     // Apply final merged values and reset container positions
     state.board = result.board
+    updateTracking()
     await showGameBoard()
 
     // Place new tile
@@ -181,51 +189,25 @@ async function executeSlide(direction: Direction): Promise<void> {
 // ---------------------------------------------------------------------------
 
 function handleScrollUp(): void {
-  switch (state.screen) {
-    case 'size-select':
-      if (state.boardSize < MAX_BOARD_SIZE) {
-        state.boardSize++
-        void updateSizeSelect()
-        appendEventLog(`Size: ${state.boardSize}`)
-      }
-      break
-
-    case 'game':
-      if (!state.animating) {
-        const dir: Direction = state.axis === 'vertical' ? 'down' : 'right'
-        void executeSlide(dir)
-        appendEventLog(`Slide: ${dir}`)
-      }
-      break
+  // SDK "scrollUp" = physical scroll down → tiles move down/right
+  if (state.screen === 'game' && !state.animating) {
+    const dir: Direction = state.axis === 'vertical' ? 'down' : 'right'
+    void executeSlide(dir)
+    appendEventLog(`Slide: ${dir}`)
   }
 }
 
 function handleScrollDown(): void {
-  switch (state.screen) {
-    case 'size-select':
-      if (state.boardSize > MIN_BOARD_SIZE) {
-        state.boardSize--
-        void updateSizeSelect()
-        appendEventLog(`Size: ${state.boardSize}`)
-      }
-      break
-
-    case 'game':
-      if (!state.animating) {
-        const dir: Direction = state.axis === 'vertical' ? 'up' : 'left'
-        void executeSlide(dir)
-        appendEventLog(`Slide: ${dir}`)
-      }
-      break
+  // SDK "scrollDown" = physical scroll up → tiles move up/left
+  if (state.screen === 'game' && !state.animating) {
+    const dir: Direction = state.axis === 'vertical' ? 'up' : 'left'
+    void executeSlide(dir)
+    appendEventLog(`Slide: ${dir}`)
   }
 }
 
 function handleClick(): void {
   switch (state.screen) {
-    case 'size-select':
-      startGame()
-      break
-
     case 'game':
       // Toggle axis
       state.axis = state.axis === 'vertical' ? 'horizontal' : 'vertical'
@@ -263,13 +245,12 @@ export async function initApp(appBridge: EvenAppBridge): Promise<void> {
     onEvenHubEvent(event)
   })
 
-  await showSizeSelect()
-  appendEventLog('2048: initialized, showing size select')
+  startGame()
+  appendEventLog('2048: initialized, game started')
 }
 
 export async function resetApp(): Promise<void> {
-  state.screen = 'size-select'
   state.animating = false
-  await showSizeSelect()
+  startGame()
   appendEventLog('2048: reset from UI button')
 }

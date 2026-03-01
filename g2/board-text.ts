@@ -134,27 +134,17 @@ export function renderBoardWithPlaceholder(board: Board, row: number, col: numbe
 // UI header text
 // ---------------------------------------------------------------------------
 
-export function renderHeader(score: number, axis: 'vertical' | 'horizontal', boardSize: number, extra?: string): string {
+export function renderHeader(
+  score: number,
+  highScore: number,
+  axis: 'vertical' | 'horizontal',
+  maxTile: number,
+): string {
   const axisSymbol = axis === 'vertical' ? '\u2195' : '\u2194' // ↕ or ↔
-  const text = `Score:${score}  ${axisSymbol}  ${boardSize}x${boardSize}`
-  if (extra) return `${text}  ${extra}`
-  return text
-}
-
-// ---------------------------------------------------------------------------
-// Size select screen
-// ---------------------------------------------------------------------------
-
-export function renderSizeSelect(currentSize: number): string {
-  const lines = [
-    '      2048',
-    '',
-    `   Board: ${currentSize}x${currentSize}`,
-    '',
-    '   \u2191\u2193 Change size',
-    '   Tap to start',
-  ]
-  return lines.join('\n')
+  const upDir = axis === 'vertical' ? '\u2191' : '\u2190' // ↑ or ←
+  const downDir = axis === 'vertical' ? '\u2193' : '\u2192' // ↓ or →
+  const maxChar = maxTile > 0 ? tileChar(maxTile) : '\u2015' // ― (dash)
+  return `[${axisSymbol}] Scroll Up:${upDir} Down:${downDir} Score:${score} High:${highScore} MAX:${maxChar}`
 }
 
 // ---------------------------------------------------------------------------

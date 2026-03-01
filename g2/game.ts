@@ -200,6 +200,20 @@ export function isGameOver(board: Board): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Max tile on board
+// ---------------------------------------------------------------------------
+
+export function getMaxTile(board: Board): number {
+  let max = 0
+  for (const row of board) {
+    for (const cell of row) {
+      if (cell > max) max = cell
+    }
+  }
+  return max
+}
+
+// ---------------------------------------------------------------------------
 // Create initial board
 // ---------------------------------------------------------------------------
 

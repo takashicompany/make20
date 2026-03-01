@@ -15,13 +15,9 @@ import {
 import { state, bridge } from './state'
 import {
   renderFullBoard,
-  renderMovingTiles,
-  renderBoardWithPlaceholder,
   renderHeader,
-  renderSizeSelect,
   renderGameOver,
 } from './board-text'
-import type { TileMove } from './game'
 
 // ---------------------------------------------------------------------------
 // Rebuild helper
@@ -42,7 +38,6 @@ async function rebuildPage(config: {
 
 // ---------------------------------------------------------------------------
 // Invisible event-capture container (snake demo pattern)
-// Content is a single space — firmware has nothing to scroll
 // ---------------------------------------------------------------------------
 
 function evtContainer(): TextContainerProperty {
@@ -60,37 +55,11 @@ function evtContainer(): TextContainerProperty {
 }
 
 // ---------------------------------------------------------------------------
-// Screen: Size selection (2 containers: evt + content)
-// ---------------------------------------------------------------------------
-
-export async function showSizeSelect(): Promise<void> {
-  const content = renderSizeSelect(state.boardSize)
-  await rebuildPage({
-    containerTotalNum: 2,
-    textObject: [
-      evtContainer(),
-      new TextContainerProperty({
-        containerID: 2,
-        containerName: 'screen',
-        content,
-        xPosition: 0,
-        yPosition: 0,
-        width: DISPLAY_WIDTH,
-        height: DISPLAY_HEIGHT,
-        isEventCapture: 0,
-        paddingLength: 8,
-      }),
-    ],
-  })
-  appendEventLog(`Screen: size-select (${state.boardSize}x${state.boardSize})`)
-}
-
-// ---------------------------------------------------------------------------
 // Screen: Game board (4 containers: evt + header + static + moving)
 // ---------------------------------------------------------------------------
 
 export async function showGameBoard(): Promise<void> {
-  const headerText = renderHeader(state.score, state.axis, state.boardSize)
+  const headerText = renderHeader(state.score, state.highScore, state.axis, state.maxTile)
   const boardText = renderFullBoard(state.board)
 
   await rebuildPage({
@@ -219,7 +188,7 @@ export async function rebuildGameBoardWithOffset(
 
 export async function updateHeader(): Promise<void> {
   if (!bridge) return
-  const headerText = renderHeader(state.score, state.axis, state.boardSize)
+  const headerText = renderHeader(state.score, state.highScore, state.axis, state.maxTile)
   await bridge.textContainerUpgrade(
     new TextContainerUpgrade({
       containerID: 2,
@@ -245,86 +214,6 @@ export async function updateStaticBoard(excludeCells?: Set<string>): Promise<voi
       contentOffset: 0,
       contentLength: 2000,
       content: boardText,
-    }),
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Update: moving tiles
-// ---------------------------------------------------------------------------
-
-export async function updateMovingTiles(
-  moves: TileMove[],
-  progress: number,
-  totalSteps: number,
-): Promise<void> {
-  if (!bridge) return
-  const text = renderMovingTiles(moves, state.boardSize, progress, totalSteps)
-  await bridge.textContainerUpgrade(
-    new TextContainerUpgrade({
-      containerID: 4,
-      containerName: 'moving',
-      contentOffset: 0,
-      contentLength: 2000,
-      content: text,
-    }),
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Clear moving tiles
-// ---------------------------------------------------------------------------
-
-export async function clearMovingTiles(): Promise<void> {
-  if (!bridge) return
-  await bridge.textContainerUpgrade(
-    new TextContainerUpgrade({
-      containerID: 4,
-      containerName: 'moving',
-      contentOffset: 0,
-      contentLength: 2000,
-      content: '',
-    }),
-  )
-}
-
-// ---------------------------------------------------------------------------
-// New tile placeholder (▒) then reveal
-// ---------------------------------------------------------------------------
-
-export async function showNewTileFade(row: number, col: number): Promise<void> {
-  if (!bridge) return
-  const text = renderBoardWithPlaceholder(state.board, row, col)
-  await bridge.textContainerUpgrade(
-    new TextContainerUpgrade({
-      containerID: 4,
-      containerName: 'moving',
-      contentOffset: 0,
-      contentLength: 2000,
-      content: text,
-    }),
-  )
-}
-
-export async function revealNewTile(): Promise<void> {
-  await clearMovingTiles()
-  await updateStaticBoard()
-}
-
-// ---------------------------------------------------------------------------
-// Update size select screen
-// ---------------------------------------------------------------------------
-
-export async function updateSizeSelect(): Promise<void> {
-  if (!bridge) return
-  const content = renderSizeSelect(state.boardSize)
-  await bridge.textContainerUpgrade(
-    new TextContainerUpgrade({
-      containerID: 2,
-      containerName: 'screen',
-      contentOffset: 0,
-      contentLength: 2000,
-      content,
     }),
   )
 }
