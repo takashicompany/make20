@@ -270,6 +270,14 @@ export async function resetApp(): Promise<void> {
   appendEventLog('2048: new game from UI button')
 }
 
+/** Development only: force game over */
+export async function forceGameOverApp(): Promise<void> {
+  state.animating = false
+  state.screen = 'gameover'
+  await showGameOverScreen()
+  appendEventLog('2048: forced game over')
+}
+
 /** Development only: reset all data including records */
 export async function resetDataApp(): Promise<void> {
   state.animating = false

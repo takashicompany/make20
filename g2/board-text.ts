@@ -176,7 +176,7 @@ export function renderHeader(
   const upLabel = axis === 'vertical' ? '\u2191 : Move UP' : '\u2191 : Move LEFT'
   const downLabel = axis === 'vertical' ? '\u2193 : Move DOWN' : '\u2193 : Move RIGHT'
   const lines = [
-    `Score:${score} High:${highScore} Max:${maxChar}`,
+    `Score:${score}\u3000High:${highScore}\u3000Max:${maxChar}`,
     '',
     '',
     `Click: ${axisSymbol}`,
@@ -216,13 +216,19 @@ export function renderMovingTilesAtPositions(
   return lines.join('\n')
 }
 
-export function renderGameOver(score: number): string {
+export function renderGameOver(
+  score: number,
+  highScore: number,
+  maxTile: number,
+): string {
+  const maxChar = maxTile > 0 ? tileChar(maxTile) : '\u2015'
   const lines = [
-    '    GAME OVER',
+    `Score:${score}\u3000High:${highScore}\u3000Max:${maxChar}`,
     '',
-    `    Score: ${score}`,
     '',
-    '    Tap to continue',
+    'GAME OVER',
+    '',
+    'Click to continue',
   ]
   return lines.join('\n')
 }

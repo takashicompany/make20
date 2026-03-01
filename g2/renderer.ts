@@ -108,24 +108,17 @@ export async function showGameBoard(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export async function showGameOverScreen(): Promise<void> {
-  const content = renderGameOver(state.score)
-  await rebuildPage({
-    containerTotalNum: 2,
-    textObject: [
-      evtContainer(),
-      new TextContainerProperty({
-        containerID: 2,
-        containerName: 'screen',
-        content,
-        xPosition: 0,
-        yPosition: 0,
-        width: DISPLAY_WIDTH,
-        height: DISPLAY_HEIGHT,
-        isEventCapture: 0,
-        paddingLength: 8,
-      }),
-    ],
-  })
+  if (!bridge) return
+  const content = renderGameOver(state.score, state.highScore, state.maxTile)
+  await bridge.textContainerUpgrade(
+    new TextContainerUpgrade({
+      containerID: 2,
+      containerName: 'header',
+      contentOffset: 0,
+      contentLength: 2000,
+      content,
+    }),
+  )
   appendEventLog(`Screen: game over (score=${state.score})`)
 }
 

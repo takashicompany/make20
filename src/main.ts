@@ -38,6 +38,13 @@ async function boot() {
     await resendApp()
   })
 
+  // Force Game Over button (development only)
+  const forceGameOverBtn = document.getElementById('forceGameOverBtn') as HTMLButtonElement | null
+  forceGameOverBtn?.addEventListener('click', async () => {
+    const { forceGameOverApp } = await import('../g2/app')
+    await forceGameOverApp()
+  })
+
   // Reset Data button (development only)
   const resetDataBtn = document.getElementById('resetDataBtn') as HTMLButtonElement | null
   resetDataBtn?.addEventListener('click', async () => {
