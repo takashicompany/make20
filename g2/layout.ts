@@ -24,8 +24,5 @@ export const NEW_TILE_DELAY_MS = 150
 export const CELL_HEIGHT_PX = 30  // pixel height per text line (tune on device)
 export const CELL_WIDTH_PX = 28   // pixel width per full-width char + separator
 
-// New tile spawn ratio (2:4 = 90:10)
-export const TILE_4_CHANCE = 0.1
-
 // Scroll cooldown
 export const SCROLL_COOLDOWN_MS = 200

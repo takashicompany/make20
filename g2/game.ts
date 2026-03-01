@@ -1,5 +1,7 @@
 import type { Board, Cell } from './state'
-import { TILE_4_CHANCE } from './layout'
+
+// Tile value cap: merging at this value stays at this value
+const MAX_TILE_VALUE = 20
 
 // ---------------------------------------------------------------------------
 // Tile movement info (for animation)
@@ -36,7 +38,7 @@ function mergeRow(row: Cell[]): { merged: Cell[]; score: number; mapping: { from
   while (i < nonZero.length) {
     if (i + 1 < nonZero.length && nonZero[i].value === nonZero[i + 1].value) {
       // Merge
-      const newVal = nonZero[i].value * 2
+      const newVal = Math.min(nonZero[i].value + 1, MAX_TILE_VALUE)
       result[writePos] = newVal
       score += newVal
       mapping.push({ from: nonZero[i].index, to: writePos, merged: false })
@@ -146,7 +148,9 @@ export function slide(board: Board, direction: Direction): SlideResult {
 }
 
 // ---------------------------------------------------------------------------
-// Place a random tile (2 or 4)
+// Place a random tile
+// Value range: min tile on board ~ floor(max tile / 2)
+// On empty/initial board, falls back to 2
 // ---------------------------------------------------------------------------
 
 export function getEmptyCells(board: Board): { row: number; col: number }[] {
@@ -165,8 +169,33 @@ export function placeRandomTile(board: Board): { row: number; col: number; value
   const empty = getEmptyCells(board)
   if (empty.length === 0) return null
 
+  // Find min and max tile values on the board
+  let min = Infinity
+  let max = 0
+  for (const row of board) {
+    for (const cell of row) {
+      if (cell > 0) {
+        if (cell < min) min = cell
+        if (cell > max) max = cell
+      }
+    }
+  }
+
+  let value: number
+  if (max === 0) {
+    // Empty board (initial placement)
+    value = 2
+  } else {
+    const lo = Math.max(min - 3, 1)
+    const hi = Math.floor(max / 2)
+    if (hi < lo) {
+      value = lo
+    } else {
+      value = lo + Math.floor(Math.random() * (hi - lo + 1))
+    }
+  }
+
   const pos = empty[Math.floor(Math.random() * empty.length)]
-  const value = Math.random() < TILE_4_CHANCE ? 4 : 2
   board[pos.row][pos.col] = value
   return { ...pos, value }
 }
@@ -219,7 +248,11 @@ export function getMaxTile(board: Board): number {
 
 export function createInitialBoard(size: number): Board {
   const board = createEmptyBoard(size)
-  placeRandomTile(board)
-  placeRandomTile(board)
+  const initialValues = [1, 2, 3, 4]
+  for (const v of initialValues) {
+    const empty = getEmptyCells(board)
+    const pos = empty[Math.floor(Math.random() * empty.length)]
+    board[pos.row][pos.col] = v
+  }
   return board
 }
