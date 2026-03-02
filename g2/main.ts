@@ -16,30 +16,30 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   })
 }
 
-export function create2048Actions(setStatus: SetStatus): AppActions {
+export function createMake20Actions(setStatus: SetStatus): AppActions {
   let connected = false
 
   return {
     async connect() {
-      setStatus('2048: connecting to Even bridge...')
-      appendEventLog('2048: connect requested')
+      setStatus('Make20: connecting to Even bridge...')
+      appendEventLog('Make20: connect requested')
 
       try {
         const bridge = await withTimeout(waitForEvenAppBridge(), 6000)
         await initApp(bridge)
         connected = true
-        setStatus('2048: connected')
-        appendEventLog('2048: connected to bridge')
+        setStatus('Make20: connected')
+        appendEventLog('Make20: connected to bridge')
       } catch (err) {
-        console.error('[2048] connect failed', err)
-        setStatus('2048: bridge not found.')
-        appendEventLog('2048: connection failed')
+        console.error('[Make20] connect failed', err)
+        setStatus('Make20: bridge not found.')
+        appendEventLog('Make20: connection failed')
       }
     },
 
     async action() {
       if (!connected) {
-        setStatus('2048: not connected')
+        setStatus('Make20: not connected')
         return
       }
     },

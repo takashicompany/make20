@@ -1,12 +1,12 @@
 {
-  "name": "2048-even-g2",
+  "name": "make20-even-g2",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
     "build": "vite build",
     "preview": "vite preview",
     "qr": "evenhub qr --http --port 5173",
-    "pack": "npm run build && evenhub pack app.json dist -o 2048.ehpk"
+    "pack": "npm run build && evenhub pack app.json dist -o make20.ehpk"
   },
   "dependencies": {
     "@evenrealities/even_hub_sdk": "^0.0.7",

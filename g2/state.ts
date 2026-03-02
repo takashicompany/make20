@@ -40,7 +40,7 @@ export function setBridge(b: EvenAppBridge): void {
 // Persistence (localStorage)
 // ---------------------------------------------------------------------------
 
-const SAVE_KEY = '2048-even-g2-save'
+const SAVE_KEY = 'make20-even-g2-save'
 
 type SaveData = {
   board: Board

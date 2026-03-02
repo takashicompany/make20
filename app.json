@@ -1,8 +1,8 @@
 {
-  "package_id": "com.ccsquad.2048",
-  "name": "2048",
+  "package_id": "com.ccsquad.make20",
+  "name": "Make20",
   "version": "1.0.0",
-  "description": "2048 puzzle game for Even G2 smart glasses",
+  "description": "Make20 puzzle game for Even G2 smart glasses",
   "author": "ccsquad",
   "entrypoint": "index.html"
 }

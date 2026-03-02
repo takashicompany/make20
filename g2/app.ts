@@ -250,10 +250,10 @@ export async function initApp(appBridge: EvenAppBridge): Promise<void> {
     state.screen = 'game'
     state.animating = false
     void showGameBoard()
-    appendEventLog('2048: restored saved game')
+    appendEventLog('Make20: restored saved game')
   } else {
     startGame()
-    appendEventLog('2048: initialized, new game')
+    appendEventLog('Make20: initialized, new game')
   }
 }
 
@@ -261,13 +261,13 @@ export async function resendApp(): Promise<void> {
   state.animating = false
   state.startupRendered = false
   void showGameBoard()
-  appendEventLog('2048: re-sent to glasses')
+  appendEventLog('Make20: re-sent to glasses')
 }
 
 export async function resetApp(): Promise<void> {
   state.animating = false
   startGame()
-  appendEventLog('2048: new game from UI button')
+  appendEventLog('Make20: new game from UI button')
 }
 
 /** Development only: force game over */
@@ -275,7 +275,7 @@ export async function forceGameOverApp(): Promise<void> {
   state.animating = false
   state.screen = 'gameover'
   await showGameOverScreen()
-  appendEventLog('2048: forced game over')
+  appendEventLog('Make20: forced game over')
 }
 
 /** Development only: reset all data including records */
@@ -283,5 +283,5 @@ export async function resetDataApp(): Promise<void> {
   state.animating = false
   resetAllData()
   startGame()
-  appendEventLog('2048: all data reset')
+  appendEventLog('Make20: all data reset')
 }
