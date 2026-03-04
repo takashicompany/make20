@@ -16,7 +16,9 @@ https://takashicompany.github.io/make20/
 
 ## Screenshots
 
-<!-- TODO: Add screenshots -->
+<p align="center">
+  <img src="images/ss/01.png" alt="Gameplay" width="400">
+</p>
 
 ## How It Works
 
