@@ -8,17 +8,13 @@ Merge identical numbers on a 4x4 board to create larger numbers. The goal is to 
 
 Scan the QR code with your Even G2 glasses to play:
 
-<p align="center">
-  <img src="qr.png" alt="QR Code" width="200">
-</p>
+![QR Code](qr.png)
 
 https://takashicompany.github.io/make20/
 
 ## Screenshots
 
-<p align="center">
-  <img src="images/ss/01.png" alt="Gameplay" width="400">
-</p>
+![Gameplay](images/ss/01.png)
 
 ## How It Works
 
