@@ -1,5 +1,7 @@
 # Make20
 
+[日本語版はこちら](README_ja.md)
+
 A 2048-style puzzle game for [Even Realities G2](https://www.evenrealities.com/) smart glasses.
 
 Merge identical numbers on a 4x4 board to create larger numbers. The goal is to reach ⑳ (20).
