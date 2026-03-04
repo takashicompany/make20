@@ -220,15 +220,17 @@ export function renderGameOver(
   score: number,
   highScore: number,
   maxTile: number,
+  blinkVisible: boolean,
+  showClickPrompt: boolean,
 ): string {
   const maxChar = maxTile > 0 ? tileChar(maxTile) : '\u2015'
   const lines = [
     `Score:${score}\u3000High:${highScore}\u3000Max:${maxChar}`,
     '',
     '',
-    'GAME OVER',
+    blinkVisible ? 'GAME OVER' : '',
     '',
-    'Click to continue',
+    showClickPrompt ? 'Click to New Game' : '',
   ]
   return lines.join('\n')
 }

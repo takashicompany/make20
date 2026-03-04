@@ -17,6 +17,7 @@ export type GameState = {
   axis: Axis
   animating: boolean
   startupRendered: boolean
+  clickable: boolean
 }
 
 export const state: GameState = {
@@ -28,6 +29,7 @@ export const state: GameState = {
   axis: 'vertical',
   animating: false,
   startupRendered: false,
+  clickable: true,
 }
 
 export let bridge: EvenAppBridge | null = null

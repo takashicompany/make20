@@ -15,7 +15,6 @@ import { state, bridge } from './state'
 import {
   renderFullBoard,
   renderHeader,
-  renderGameOver,
 } from './board-text'
 
 // ---------------------------------------------------------------------------
@@ -104,25 +103,6 @@ export async function showGameBoard(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Screen: Game over (2 containers: evt + content)
-// ---------------------------------------------------------------------------
-
-export async function showGameOverScreen(): Promise<void> {
-  if (!bridge) return
-  const content = renderGameOver(state.score, state.highScore, state.maxTile)
-  await bridge.textContainerUpgrade(
-    new TextContainerUpgrade({
-      containerID: 2,
-      containerName: 'header',
-      contentOffset: 0,
-      contentLength: 2000,
-      content,
-    }),
-  )
-  appendEventLog(`Screen: game over (score=${state.score})`)
-}
-
-// ---------------------------------------------------------------------------
 // Rebuild game board with moving container at pixel offset (for animation)
 // ---------------------------------------------------------------------------
 
@@ -188,6 +168,19 @@ export async function updateHeader(): Promise<void> {
       contentOffset: 0,
       contentLength: 200,
       content: headerText,
+    }),
+  )
+}
+
+export async function updateHeaderContent(content: string): Promise<void> {
+  if (!bridge) return
+  await bridge.textContainerUpgrade(
+    new TextContainerUpgrade({
+      containerID: 2,
+      containerName: 'header',
+      contentOffset: 0,
+      contentLength: 2000,
+      content,
     }),
   )
 }

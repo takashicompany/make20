@@ -13,12 +13,13 @@ import { slide, placeRandomTile, isGameOver, createInitialBoard, getMaxTile } fr
 import {
   renderFullBoard,
   renderHeader,
+  renderGameOver,
   renderMovingTilesAtPositions,
 } from './board-text'
 import {
   showGameBoard,
-  showGameOverScreen,
   updateHeader,
+  updateHeaderContent,
   updateStaticBoard,
   rebuildGameBoardWithOffset,
 } from './renderer'
@@ -44,15 +45,65 @@ function updateTracking(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Game Over blink management
+// ---------------------------------------------------------------------------
+
+let blinkTimer: ReturnType<typeof setInterval> | null = null
+let clickableTimer: ReturnType<typeof setTimeout> | null = null
+
+function stopGameOverTimers(): void {
+  if (blinkTimer !== null) {
+    clearInterval(blinkTimer)
+    blinkTimer = null
+  }
+  if (clickableTimer !== null) {
+    clearTimeout(clickableTimer)
+    clickableTimer = null
+  }
+}
+
+function startGameOverSequence(): void {
+  state.screen = 'gameover'
+  state.clickable = false
+
+  let blinkVisible = true
+
+  const updateBlink = (): void => {
+    const content = renderGameOver(
+      state.score, state.highScore, state.maxTile,
+      blinkVisible, state.clickable,
+    )
+    void updateHeaderContent(content)
+    blinkVisible = !blinkVisible
+  }
+
+  // Show first frame immediately
+  updateBlink()
+
+  // Start 400ms blink
+  blinkTimer = setInterval(updateBlink, 400)
+
+  // After 2 seconds, enable clicking and show prompt
+  clickableTimer = setTimeout(() => {
+    state.clickable = true
+    clickableTimer = null
+  }, 2000)
+
+  appendEventLog(`Game over! Score: ${state.score}`)
+}
+
+// ---------------------------------------------------------------------------
 // Game lifecycle
 // ---------------------------------------------------------------------------
 
 function startGame(): void {
+  stopGameOverTimers()
   state.board = createInitialBoard(4)
   state.score = 0
   state.axis = 'vertical'
   state.screen = 'game'
   state.animating = false
+  state.clickable = true
   updateTracking()
   saveState()
   void showGameBoard()
@@ -177,10 +228,7 @@ async function executeSlide(direction: Direction): Promise<void> {
 
     // Check game over
     if (isGameOver(state.board)) {
-      state.screen = 'gameover'
-      appendEventLog(`Game over! Score: ${state.score}`)
-      await sleep(500)
-      await showGameOverScreen()
+      startGameOverSequence()
     }
   } finally {
     state.animating = false
@@ -219,7 +267,9 @@ function handleClick(): void {
       break
 
     case 'gameover':
-      restartGame()
+      if (state.clickable) {
+        restartGame()
+      }
       break
   }
 }
@@ -273,8 +323,7 @@ export async function resetApp(): Promise<void> {
 /** Development only: force game over */
 export async function forceGameOverApp(): Promise<void> {
   state.animating = false
-  state.screen = 'gameover'
-  await showGameOverScreen()
+  startGameOverSequence()
   appendEventLog('Make20: forced game over')
 }
 
