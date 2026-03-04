@@ -26,12 +26,14 @@ Unlike the original 2048 (which doubles: 2→4→8→...), Make20 uses sequentia
 
 The board is rendered entirely with Unicode characters (circled numbers ①-⑳) to work within the G2's text container system.
 
-|   |   |   |   |
-|:-:|:-:|:-:|:-:|
-| ① | ② |   | ④ |
-|   | ③ | ① |   |
-| ② |   | ⑤ | ① |
-|   | ④ |   | ② |
+```
+┌── ── ── ──┐
+│① ②　 ④│
+│　 ③ ①　│
+│②　 ⑤ ①│
+│　 ④　 ②│
+└── ── ── ──┘
+```
 
 ## Controls
 
