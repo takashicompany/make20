@@ -286,8 +286,8 @@ export async function initApp(appBridge: EvenAppBridge): Promise<void> {
   setBridge(appBridge)
 
   setEventHandlers({
-    onScrollUp: handleScrollUp,
-    onScrollDown: handleScrollDown,
+    onScrollUp: handleScrollDown,
+    onScrollDown: handleScrollUp,
     onClick: handleClick,
     onDoubleClick: handleDoubleClick,
   })
