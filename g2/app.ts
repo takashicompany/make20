@@ -240,18 +240,18 @@ async function executeSlide(direction: Direction): Promise<void> {
 // ---------------------------------------------------------------------------
 
 function handleScrollUp(): void {
-  // SDK "scrollUp" = physical scroll down → tiles move down/right
+  // SDK "scrollUp" → tiles move up/left
   if (state.screen === 'game' && !state.animating) {
-    const dir: Direction = state.axis === 'vertical' ? 'down' : 'right'
+    const dir: Direction = state.axis === 'vertical' ? 'up' : 'left'
     void executeSlide(dir)
     appendEventLog(`Slide: ${dir}`)
   }
 }
 
 function handleScrollDown(): void {
-  // SDK "scrollDown" = physical scroll up → tiles move up/left
+  // SDK "scrollDown" → tiles move down/right
   if (state.screen === 'game' && !state.animating) {
-    const dir: Direction = state.axis === 'vertical' ? 'up' : 'left'
+    const dir: Direction = state.axis === 'vertical' ? 'down' : 'right'
     void executeSlide(dir)
     appendEventLog(`Slide: ${dir}`)
   }
